@@ -50,6 +50,9 @@ class MazeWindow:
             self.__canvas.delete("all")
             self.__maze.draw(self.__canvas)
 
+        def create_maze():
+            self.__maze = Maze(row_count, col_count, row_size, col_size, **padding)
+
         self.__buttons = [
             Button(
                 self.__button_pane,
@@ -91,7 +94,11 @@ class MazeWindow:
                     enable_buttons(),
                 ),
             ),
-            Button(self.__button_pane, text="Reset", command=reset_canvas),
+            Button(
+                self.__button_pane,
+                text="Reset",
+                command=lambda: (create_maze(), reset_canvas()),
+            ),
         ]
 
         def disable_buttons():
