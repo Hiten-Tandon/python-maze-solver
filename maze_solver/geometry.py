@@ -98,4 +98,4 @@ class Cell:
 
     def draw_move(self, to_cell: Self, canvas: Canvas, final: bool = False):
         move: Line = Line(self.__get_center(), to_cell.__get_center())
-        move.draw(canvas, "red" if final else "blue")
+        move.draw(canvas, "red" if final else "cyan")

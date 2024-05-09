@@ -1,3 +1,4 @@
+import time
 import heapq
 from typing import Callable
 from geometry import *
@@ -55,13 +56,17 @@ class Maze:
                 top_factors[col] = bottom_factor > 0.5625
                 left_factor = right_factor > 0.5625
 
-    def __animate_solution(self, canvas: Canvas, path: list[tuple[int, int]]):
+    def __animate_solution(
+        self, canvas: Canvas, path: list[tuple[int, int]], fn: Callable
+    ):
         r, c = path.pop()
 
         while len(path) != 0:
             nr, nc = path.pop()
             self.__matrix[r][c].draw_move(self.__matrix[nr][nc], canvas, final=True)
             r, c = nr, nc
+            fn()
+            time.sleep(0.01)
 
     def animate_dfs(self, canvas: Canvas, fn: Callable):
         frontier = [(self.__start, [])]
@@ -75,7 +80,7 @@ class Maze:
 
             path.append(pos)
             if pos == self.__end:
-                self.__animate_solution(canvas, path)
+                self.__animate_solution(canvas, path, fn)
                 fn()
                 return
             row, col = pos
@@ -93,7 +98,7 @@ class Maze:
             fn()
 
         for path in alt:
-            self.__animate_solution(canvas, path)
+            self.__animate_solution(canvas, path, fn)
 
     def animate_bfs(self, canvas: Canvas, fn: Callable):
         frontier = deque([(self.__start, [])])
@@ -107,7 +112,7 @@ class Maze:
 
             path.append(pos)
             if pos == self.__end:
-                self.__animate_solution(canvas, path)
+                self.__animate_solution(canvas, path, fn)
                 fn()
                 return
             row, col = pos
@@ -125,7 +130,7 @@ class Maze:
             fn()
 
         for path in alt:
-            self.__animate_solution(canvas, path)
+            self.__animate_solution(canvas, path, fn)
 
     def animate_gbfs(self, canvas: Canvas, fn: Callable):
         frontier = [
@@ -146,7 +151,7 @@ class Maze:
 
             path.append(pos)
             if pos == self.__end:
-                self.__animate_solution(canvas, path)
+                self.__animate_solution(canvas, path, fn)
                 fn()
                 return
             row, col = pos
@@ -171,7 +176,7 @@ class Maze:
             fn()
 
         for path in alt:
-            self.__animate_solution(canvas, path)
+            self.__animate_solution(canvas, path, fn)
 
     def animate_astar(self, canvas: Canvas, fn: Callable):
         frontier = [
@@ -186,13 +191,13 @@ class Maze:
         alt = []
 
         while len(frontier) != 0:
-            p, pos, path = heapq.heappop(frontier)
+            _, pos, path = heapq.heappop(frontier)
             if pos in path or vis[pos[0]][pos[1]]:
                 continue
 
             path.append(pos)
             if pos == self.__end:
-                self.__animate_solution(canvas, path)
+                self.__animate_solution(canvas, path, fn)
                 fn()
                 return
             row, col = pos
@@ -217,9 +222,9 @@ class Maze:
             fn()
 
         for path in alt:
-            self.__animate_solution(canvas, path)
+            self.__animate_solution(canvas, path, fn)
 
     def draw(self, canvas: Canvas):
         for row in self.__matrix:
             for cell in row:
-                cell.draw(canvas, "black")
+                cell.draw(canvas, "#A3A3A3")
