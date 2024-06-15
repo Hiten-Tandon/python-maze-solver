@@ -3,18 +3,12 @@ from typing import Self
 
 
 class Point:
-    x: float
-    y: float
-
     def __init__(self, x: float = 0, y: float = 0) -> None:
         self.x = x
         self.y = y
 
 
 class Line:
-    __start: Point
-    __end: Point
-
     def __init__(self, start: Point, end: Point):
         self.__start = start
         self.__end = end
@@ -31,9 +25,6 @@ class Line:
 
 
 class Cell:
-    __walls: list[Line]
-    connections: list[tuple[int, int]]
-    __corners: tuple[Point, Point, Point, Point]
     __top_left: int = 0
     __top_right: int = 1
     __bottom_left: int = 2

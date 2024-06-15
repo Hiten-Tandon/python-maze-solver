@@ -1,4 +1,4 @@
-from tkinter import Tk, Canvas, Button, PanedWindow, VERTICAL, StringVar
+from tkinter import Tk, Canvas, Button, PanedWindow, VERTICAL, messagebox
 from tkinter.font import Font
 from tkinter.ttk import Button, Label, PanedWindow, Style
 from tkinter.constants import BOTH, HORIZONTAL
@@ -15,13 +15,6 @@ This process goes on until either the maze is solved or it runs out of options.
 
 
 class MazeWindow:
-    __width: float
-    __height: float
-    __root: Tk
-    __canvas: Canvas
-    __is_active: bool
-    __maze: Maze
-
     def __init__(
         self,
         row_count: int,
@@ -67,6 +60,19 @@ class MazeWindow:
             borderwidth=2.0,
         )
 
+        def create_prompt():
+            mb = messagebox.Message(
+                master=None,
+                default="ok",
+                detail="Maze is not solvable, reset to create a new one.",
+                title="Maze can't be solved",
+                type="ok",
+            )
+
+            mb.show()
+            create_maze()
+            reset_canvas()
+
         buttons = [
             Button(
                 button_pane,
@@ -74,7 +80,7 @@ class MazeWindow:
                 command=lambda: (
                     reset_canvas(),
                     disable_buttons(),
-                    self.__maze.animate_dfs(self.__canvas, self.redraw),
+                    self.__maze.animate_dfs(self.__canvas, self.redraw, create_prompt),
                     enable_buttons(),
                 ),
             ),
@@ -84,7 +90,7 @@ class MazeWindow:
                 command=lambda: (
                     reset_canvas(),
                     disable_buttons(),
-                    self.__maze.animate_bfs(self.__canvas, self.redraw),
+                    self.__maze.animate_bfs(self.__canvas, self.redraw, create_prompt),
                     enable_buttons(),
                 ),
             ),
@@ -94,7 +100,7 @@ class MazeWindow:
                 command=lambda: (
                     reset_canvas(),
                     disable_buttons(),
-                    self.__maze.animate_gbfs(self.__canvas, self.redraw),
+                    self.__maze.animate_gbfs(self.__canvas, self.redraw, create_prompt),
                     enable_buttons(),
                 ),
             ),
@@ -104,13 +110,15 @@ class MazeWindow:
                 command=lambda: (
                     reset_canvas(),
                     disable_buttons(),
-                    self.__maze.animate_astar(self.__canvas, self.redraw),
+                    self.__maze.animate_astar(
+                        self.__canvas, self.redraw, create_prompt
+                    ),
                     enable_buttons(),
                 ),
             ),
             Button(
                 button_pane,
-                text="Reset",
+                text="Reset Maze",
                 command=lambda: (create_maze(), reset_canvas()),
                 padding={"top": 50, "left": 50},
             ),
@@ -128,13 +136,13 @@ class MazeWindow:
             b.pack(padx=10, pady=10, anchor="center")
 
         s = Style(self.__root)
-        s.configure(
-            ".",
-            foreground=[("!disabled", "white"), ("disabled", "grey")],
-            background=[("!disabled", "#7e7e7e"), ("disabled", "#7e7e7e")],
-            font=Font(family="JetBrains Mono NF", size=12),
-        )
-        s.map("TLabel", foreground=[("!disabled", "white"), ("disabled", "grey")])
+        # s.configure(
+        #     ".",
+        #     foreground=[("!disabled", "white"), ("disabled", "grey")],
+        #     background=[("!disabled", "#7e7e7e"), ("disabled", "#7e7e7e")],
+        #     font=Font(family="JetBrains Mono NF", size=12),
+        # )
+        # s.map("TLabel", foreground=[("!disabled", "white"), ("disabled", "grey")])
         s.map(
             "TButton",
             foreground=[("!disabled", "white"), ("disabled", "grey")],

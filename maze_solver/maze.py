@@ -7,9 +7,6 @@ import random
 
 
 class Maze:
-    __matrix: list[list[Cell]]
-    __start: tuple[int, int]
-    __end: tuple[int, int]
 
     def __init__(
         self,
@@ -68,10 +65,9 @@ class Maze:
             fn()
             time.sleep(0.01)
 
-    def animate_dfs(self, canvas: Canvas, fn: Callable):
+    def animate_dfs(self, canvas: Canvas, fn: Callable, fail_fn: Callable):
         frontier = [(self.__start, [])]
         vis = [[False] * len(self.__matrix[0]) for _ in self.__matrix]
-        alt = []
 
         while len(frontier) != 0:
             pos, path = frontier.pop()
@@ -86,8 +82,6 @@ class Maze:
             row, col = pos
 
             vis[row][col] = True
-            if len(self.__matrix[row][col].connections) == 0:
-                alt.append(path)
             for dr, dc in self.__matrix[row][col].connections:
                 if row + dr < 0 or col + dc < 0:
                     continue
@@ -96,18 +90,15 @@ class Maze:
                 )
                 frontier.append(((row + dr, col + dc), [(a, b) for a, b in path]))
             fn()
+        fail_fn()
 
-        for path in alt:
-            self.__animate_solution(canvas, path, fn)
-
-    def animate_bfs(self, canvas: Canvas, fn: Callable):
+    def animate_bfs(self, canvas: Canvas, fn: Callable, fail_fn: Callable):
         frontier = deque([(self.__start, [])])
         vis = [[False] * len(self.__matrix[0]) for _ in self.__matrix]
-        alt = []
 
         while len(frontier) != 0:
             pos, path = frontier.popleft()
-            if pos in path or vis[pos[0]][pos[1]]:
+            if vis[pos[0]][pos[1]]:
                 continue
 
             path.append(pos)
@@ -118,8 +109,6 @@ class Maze:
             row, col = pos
 
             vis[row][col] = True
-            if len(self.__matrix[row][col].connections) == 0:
-                alt.append(path)
             for dr, dc in self.__matrix[row][col].connections:
                 if row + dr < 0 or col + dc < 0:
                     continue
@@ -128,11 +117,9 @@ class Maze:
                 )
                 frontier.append(((row + dr, col + dc), [(a, b) for a, b in path]))
             fn()
+        fail_fn()
 
-        for path in alt:
-            self.__animate_solution(canvas, path, fn)
-
-    def animate_gbfs(self, canvas: Canvas, fn: Callable):
+    def animate_gbfs(self, canvas: Canvas, fn: Callable, fail_fn: Callable):
         frontier = [
             (
                 abs(self.__start[0] - self.__end[0])
@@ -142,11 +129,10 @@ class Maze:
             )
         ]
         vis = [[False] * len(self.__matrix[0]) for _ in self.__matrix]
-        alt = []
 
         while len(frontier) != 0:
             _, pos, path = heapq.heappop(frontier)
-            if pos in path or vis[pos[0]][pos[1]]:
+            if vis[pos[0]][pos[1]]:
                 continue
 
             path.append(pos)
@@ -157,8 +143,6 @@ class Maze:
             row, col = pos
 
             vis[row][col] = True
-            if len(self.__matrix[row][col].connections) == 0:
-                alt.append(path)
             for dr, dc in self.__matrix[row][col].connections:
                 if row + dr < 0 or col + dc < 0:
                     continue
@@ -174,11 +158,9 @@ class Maze:
                     ),
                 )
             fn()
+        fail_fn()
 
-        for path in alt:
-            self.__animate_solution(canvas, path, fn)
-
-    def animate_astar(self, canvas: Canvas, fn: Callable):
+    def animate_astar(self, canvas: Canvas, fn: Callable, fail_fn: Callable):
         frontier = [
             (
                 abs(self.__start[0] - self.__end[0])
@@ -188,11 +170,10 @@ class Maze:
             )
         ]
         vis = [[False] * len(self.__matrix[0]) for _ in self.__matrix]
-        alt = []
 
         while len(frontier) != 0:
             _, pos, path = heapq.heappop(frontier)
-            if pos in path or vis[pos[0]][pos[1]]:
+            if vis[pos[0]][pos[1]]:
                 continue
 
             path.append(pos)
@@ -203,8 +184,6 @@ class Maze:
             row, col = pos
 
             vis[row][col] = True
-            if len(self.__matrix[row][col].connections) == 0:
-                alt.append(path)
             for dr, dc in self.__matrix[row][col].connections:
                 if row + dr < 0 or col + dc < 0:
                     continue
@@ -221,8 +200,7 @@ class Maze:
                 )
             fn()
 
-        for path in alt:
-            self.__animate_solution(canvas, path, fn)
+        fail_fn()
 
     def draw(self, canvas: Canvas):
         for row in self.__matrix:
