@@ -7,11 +7,15 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-    in
-    {
+    in {
       devShells.${system}.default = pkgs.mkShell {
-        buildInputs = with pkgs; [ python311Full python311Packages.tkinter poetry ];
+        buildInputs = with pkgs; [
+          python311Full
+          python311Packages.tkinter
+          poetry
+        ];
         shellHook = ''
+          python maze_solver
         '';
       };
     };
